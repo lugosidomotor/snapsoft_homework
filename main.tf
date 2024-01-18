@@ -71,7 +71,7 @@ resource "aws_s3_object" "lambda_code" {
 ################## Lambda Function ##################
 
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "lambda_execution_role"
+  name = "dnsdetectives_lambda_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -85,8 +85,8 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
-resource "aws_lambda_function" "example" {
-  function_name    = "example_lambda_function"
+resource "aws_lambda_function" "dnsdetectives_lambda_function" {
+  function_name    = "dnsdetectives_lambda_function"
   s3_bucket        = aws_s3_bucket.lambda_code_bucket.bucket
   s3_key           = aws_s3_object.lambda_code.key
   handler          = "lambda.handler" // Update with the correct handler
@@ -105,14 +105,14 @@ resource "aws_lambda_function" "example" {
 
 ################## API Gateway ##################
 
-resource "aws_api_gateway_rest_api" "example" {
-  name        = "example_api"
+resource "aws_api_gateway_rest_api" "dnsdetectives_api" {
+  name        = "dnsdetectives_api"
   description = "API Gateway for Lambda example"
 }
 
 resource "aws_api_gateway_resource" "example_resource" {
-  rest_api_id = aws_api_gateway_rest_api.example.id
-  parent_id   = aws_api_gateway_rest_api.example.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.dnsdetectives_api.id
+  parent_id   = aws_api_gateway_rest_api.dnsdetectives_api.root_resource_id
   path_part   = "example-path"
 }
 
@@ -124,7 +124,7 @@ resource "aws_api_gateway_method" "example_method" {
 }
 
 resource "aws_api_gateway_integration" "lambda_integration" {
-  rest_api_id = aws_api_gateway_rest_api.example.id
+  rest_api_id = aws_api_gateway_rest_api.dnsdetectives_api.id
   resource_id = aws_api_gateway_resource.example_resource.id
   http_method = aws_api_gateway_method.example_method.http_method
   integration_http_method = "POST"
@@ -135,7 +135,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
 resource "aws_api_gateway_deployment" "example_deployment" {
   depends_on = [aws_api_gateway_integration.lambda_integration]
 
-  rest_api_id = aws_api_gateway_rest_api.example.id
+  rest_api_id = aws_api_gateway_rest_api.dnsdetectives_api.id
   stage_name  = "test"
 }
 

@@ -105,7 +105,6 @@ jobs:
 
     - name: Auto-merge to branch
       if: steps.git-check.outputs.changes == 'true'
-    - name: Push changes
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.PAT }}

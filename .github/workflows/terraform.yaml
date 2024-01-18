@@ -45,7 +45,7 @@ jobs:
 
     - name: Check if S3 Bucket exists
       run: |
-        bucket_name="cloudguruterraformstate"
+        bucket_name="DnsDetectivesState"
         region="eu-central-1"
         
         # Check if the bucket exists

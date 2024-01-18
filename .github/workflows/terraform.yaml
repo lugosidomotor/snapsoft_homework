@@ -27,6 +27,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # Specify the Node.js version
+
+    - name: Install Node.js Dependencies
+      run: |
+        npm install pg  # Install required Node.js modules
+
     - name: Install Terraform
       run: |
         # Install the latest version of Terraform

@@ -18,6 +18,11 @@ on:
         options: 
         - apply
         - destroy
+      aws-region:
+        description: 'AWS Region'
+        required: false
+        type: string
+        default: 'us-west-2'
 
 jobs:
   terraform_apply:
@@ -50,12 +55,12 @@ jobs:
       with:
         aws-access-key-id: ${{ github.event.inputs.access-key-id }}
         aws-secret-access-key: ${{ github.event.inputs.secret-access-key }}
-        aws-region: us-west-2
+        aws-region: ${{ github.event.inputs.aws-region }}
 
     - name: Check if S3 Bucket exists
       run: |
         bucket_name="dnsdetectives-terraform-state-dev"
-        region="us-west-2"
+        region="${{ github.event.inputs.aws-region }}"
         
         # Check if the bucket exists
         if aws s3api head-bucket --bucket "$bucket_name" --region "$region" 2>/dev/null; then

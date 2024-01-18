@@ -74,7 +74,7 @@ jobs:
         
     - name: Check if S3 Lambda Code Bucket exists
       run: |
-        bucket_name="dnsdetectives-lambda-code"
+        bucket_name="dnsdetectives-lambda-code-bucket"
         region="${{ github.event.inputs.aws-region }}"
         
         # Check if the bucket exists

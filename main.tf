@@ -45,7 +45,7 @@ publicly_accessible = true
 ################## Lambda code ##################
 
 resource "aws_s3_bucket" "lambda_code_bucket" {
-  bucket = "dnsdetectives-lambda-code-bucket"
+  bucket = "dnsdetectives-lambda-code"
   // Removed ACL configuration
 }
 

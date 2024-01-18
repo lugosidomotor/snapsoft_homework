@@ -54,7 +54,7 @@ jobs:
 
     - name: Check if S3 Bucket exists
       run: |
-        bucket_name="dnsdetectives-terraform-state"
+        bucket_name="dnsdetectives-terraform-state-dev"
         region="us-west-2"
         
         # Check if the bucket exists

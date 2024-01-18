@@ -41,7 +41,7 @@ jobs:
       with:
         aws-access-key-id: ${{ github.event.inputs.access-key-id }}
         aws-secret-access-key: ${{ github.event.inputs.secret-access-key }}
-        aws-region: eu-central-1
+        aws-region: eu-west-2
 
     - name: Check if S3 Bucket exists
       run: |

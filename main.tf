@@ -133,7 +133,7 @@ resource "aws_s3_bucket" "lambda_code_bucket" {
 
 resource "null_resource" "zip_lambda_function" {
   triggers = {
-    lambda_source_files = "${sha256(file("${path.module}/lambda.js"))}"
+    always_run = "${timestamp()}"
   }
 
   provisioner "local-exec" {

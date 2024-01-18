@@ -137,7 +137,10 @@ resource "null_resource" "zip_lambda_function" {
   }
 
   provisioner "local-exec" {
-    command = "zip -j ${path.module}/lambda.zip ${path.module}/lambda.js"
+    command = <<EOT
+      cd ${path.module}
+      zip -r lambda.zip lambda.js node_modules
+    EOT
   }
 }
 

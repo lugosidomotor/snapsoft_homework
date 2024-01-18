@@ -92,7 +92,6 @@ resource "aws_lambda_function" "example" {
   handler          = "lambda.handler" // Update with the correct handler
   runtime          = "nodejs12.x"     // Update with the correct runtime
   role             = aws_iam_role.lambda_execution_role.arn
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   environment {
     variables = {

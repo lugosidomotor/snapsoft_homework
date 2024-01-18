@@ -41,3 +41,29 @@ parameter_group_name = "default.postgres15"
 skip_final_snapshot = true
 publicly_accessible = true
 }
+
+################## Lambda code ##################
+
+resource "aws_s3_bucket" "lambda_code_bucket" {
+  bucket = "my-lambda-code-bucket"
+  acl    = "private"
+}
+
+resource "null_resource" "zip_lambda_function" {
+  provisioner "local-exec" {
+    command = "zip lambda.zip lambda.js"
+    working_dir = path.module
+  }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
+resource "aws_s3_bucket_object" "lambda_code" {
+  bucket = aws_s3_bucket.lambda_code_bucket.bucket
+  key    = "lambda.zip"
+  source = "${path.module}/lambda.zip"
+
+  depends_on = [null_resource.zip_lambda_function]
+}

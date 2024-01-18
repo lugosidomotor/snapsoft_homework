@@ -172,7 +172,7 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
   s3_bucket        = aws_s3_bucket.lambda_code_bucket.bucket
   s3_key           = aws_s3_object.lambda_code.key
   handler          = "lambda.handler" // Update with the correct handler
-  runtime          = "nodejs12.x"     // Update with the correct runtime
+  runtime          = "nodejs18.x"     // Update with the correct runtime
   role             = aws_iam_role.lambda_execution_role.arn
 
   environment {

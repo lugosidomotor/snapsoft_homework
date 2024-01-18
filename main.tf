@@ -177,10 +177,10 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
 
   environment {
     variables = {
-      DB_HOST     = aws_db_instance.sample_db.address
-      DB_USER     = aws_db_instance.sample_db.username
-      DB_PASSWORD = aws_db_instance.sample_db.password
-      DB_NAME     = aws_db_instance.sample_db.db_name
+      DB_HOST     = aws_db_instance.dnsdetectives_db.address
+      DB_USER     = aws_db_instance.dnsdetectives_db.username
+      DB_PASSWORD = aws_db_instance.dnsdetectives_db.password
+      DB_NAME     = aws_db_instance.dnsdetectives_db.db_name
     }
   }
 }
@@ -211,7 +211,7 @@ resource "aws_api_gateway_integration" "dnsdetectives_lambda_integration" {
   http_method = aws_api_gateway_method.dnsdetectives_method.http_method
   integration_http_method = "POST"
   type        = "AWS_PROXY"
-  uri         = aws_lambda_function.dnsdetectives.invoke_arn
+  uri         = aws_lambda_function.dnsdetectives_lambda_function.invoke_arn
 }
 
 resource "aws_api_gateway_deployment" "dnsdetectives_deployment" {

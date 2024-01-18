@@ -201,9 +201,9 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
   environment {
     variables = {
       DB_HOST     = aws_db_instance.dnsdetectives_db.address
-      DB_USER     = aws_db_instance.dnsdetectives_db.username
+      DB_DATABASE = aws_db_instance.dnsdetectives_db.db_name
       DB_PASSWORD = aws_db_instance.dnsdetectives_db.password
-      DB_USERNAME = aws_db_instance.dnsdetectives_db.db_name
+      DB_USERNAME = aws_db_instance.dnsdetectives_db.username
     }
   }
 

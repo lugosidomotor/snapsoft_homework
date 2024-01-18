@@ -6,8 +6,8 @@ terraform {
   }
   
   backend "s3" {
-   bucket = "dnsdetectivesterraformstate"
-   key    = "dnsdetectivesterraformstate"
+   bucket = "dnsdetectives-terraform-state"
+   key    = "dnsdetectives-terraform-state"
    region = "eu-central-1"
   }
 }

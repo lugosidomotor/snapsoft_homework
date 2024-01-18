@@ -142,9 +142,13 @@ resource "null_resource" "zip_lambda_function" {
   }
 }
 
+resource "random_id" "lambda_zip_id" {
+  byte_length = 8
+}
+
 resource "aws_s3_object" "lambda_code" {
   bucket = aws_s3_bucket.lambda_code_bucket.bucket
-  key    = "lambda.zip"
+  key    = "lambda-${random_id.lambda_zip_id.hex}.zip"
   source = "${path.module}/lambda.zip"
 
   depends_on = [null_resource.zip_lambda_function]
@@ -171,9 +175,11 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
   function_name    = "dnsdetectives_lambda_function"
   s3_bucket        = aws_s3_bucket.lambda_code_bucket.bucket
   s3_key           = aws_s3_object.lambda_code.key
-  handler          = "lambda.handler" // Update with the correct handler
-  runtime          = "nodejs18.x"     // Update with the correct runtime
+  handler          = "lambda.handler"
+  runtime          = "nodejs18.x"
   role             = aws_iam_role.lambda_execution_role.arn
+
+  source_code_hash = "${filebase64sha256("${path.module}/lambda.zip")}"
 
   environment {
     variables = {
@@ -182,6 +188,11 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
       DB_PASSWORD = aws_db_instance.dnsdetectives_db.password
       DB_NAME     = aws_db_instance.dnsdetectives_db.db_name
     }
+  }
+
+  # Force recreation of the lambda function
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

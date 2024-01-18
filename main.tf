@@ -8,7 +8,7 @@ terraform {
   backend "s3" {
    bucket = "dnsdetectives-terraform-state"
    key    = "dnsdetectives-terraform-state"
-   region = "eu-central-1"
+   region = "us-east-1"
   }
 }
 
@@ -17,7 +17,7 @@ locals {
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = "us-east-1"
   default_tags {
     tags = {
       Terraform   = "true"

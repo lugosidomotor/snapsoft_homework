@@ -12,7 +12,7 @@ resource "null_resource" "zip_lambda_function" {
 }
 
 resource "aws_s3_object" "lambda_code" {
-  bucket = dnsdetectives-lambda-code
+  bucket = dnsdetectives-lambda-code-bucket
   key    = "lambda-${timestamp()}.zip"
   source = "${path.module}/lambda.zip"
 
@@ -56,7 +56,7 @@ resource "aws_iam_role_policy" "lambda_vpc_access" {
 
 resource "aws_lambda_function" "dnsdetectives_lambda_function" {
   function_name    = "dnsdetectives_lambda_function"
-  s3_bucket        = dnsdetectives-lambda-code
+  s3_bucket        = dnsdetectives-lambda-code-bucket
   s3_key           = aws_s3_object.lambda_code.key
   handler          = "lambda.handler"
   runtime          = "nodejs18.x"

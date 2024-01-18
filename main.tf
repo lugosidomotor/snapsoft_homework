@@ -45,7 +45,11 @@ publicly_accessible = true
 ################## Lambda code ##################
 
 resource "aws_s3_bucket" "lambda_code_bucket" {
-  bucket = "my-lambda-code-bucket"
+  bucket = "dnsdetectives-lambda-code-bucket"
+}
+
+resource "aws_s3_bucket_acl" "lambda_code_bucket_acl" {
+  bucket = aws_s3_bucket.lambda_code_bucket.id
   acl    = "private"
 }
 
@@ -60,10 +64,11 @@ resource "null_resource" "zip_lambda_function" {
   }
 }
 
-resource "aws_s3_bucket_object" "lambda_code" {
+resource "aws_s3_object" "lambda_code" { // Replace aws_s3_bucket_object with aws_s3_object
   bucket = aws_s3_bucket.lambda_code_bucket.bucket
   key    = "lambda.zip"
   source = "${path.module}/lambda.zip"
 
   depends_on = [null_resource.zip_lambda_function]
 }
+

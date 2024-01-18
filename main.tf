@@ -14,6 +14,7 @@ terraform {
 
 locals {
   Environment = "dev"
+  Company     = "dnsdetectives"
 }
 
 provider "aws" {
@@ -22,9 +23,9 @@ provider "aws" {
     tags = {
       Terraform   = "true"
       Environment = local.Environment
+      Company     = loca.Company
     }
   }
-
 }
 
 ################## RDS ##################
@@ -188,7 +189,6 @@ resource "aws_iam_role_policy" "lambda_vpc_access" {
     ]
   })
 }
-
 
 resource "aws_lambda_function" "dnsdetectives_lambda_function" {
   function_name    = "dnsdetectives_lambda_function"

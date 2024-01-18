@@ -41,12 +41,12 @@ jobs:
       with:
         aws-access-key-id: ${{ github.event.inputs.access-key-id }}
         aws-secret-access-key: ${{ github.event.inputs.secret-access-key }}
-        aws-region: eu-west-2
+        aws-region: us-west-2
 
     - name: Check if S3 Bucket exists
       run: |
         bucket_name="dnsdetectives-terraform-state"
-        region="us-east-1"
+        region="us-west-2"
         
         # Check if the bucket exists
         if aws s3api head-bucket --bucket "$bucket_name" --region "$region" 2>/dev/null; then

@@ -70,6 +70,25 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    - name: Check for changes
+      id: git-check
+      run: |
+        if [[ `git status --porcelain` ]]; then
+          echo "::set-output name=changes::true"
+        fi
+
+    - name: Commit formatted code
+      if: steps.git-check.outputs.changes == 'true'
+      run: |
+        git config --global user.name 'Your Name'
+        git config --global user.email 'your-email@example.com'
+        git add -u
+        git commit -m "Format Terraform code"
+        git push
+
     - name: Terraform Validate
       run: terraform validate
 
@@ -79,3 +98,11 @@ jobs:
       run: |
         #aws secretsmanager delete-secret --secret-id cloudguru-temp-ec2-ssh  --force-delete-without-recovery --region us-west-2
         terraform ${{ github.event.inputs.terraform-action }} -auto-approve
+
+    - name: Auto-merge to branch
+      if: steps.git-check.outputs.changes == 'true'
+      uses: pascalgn/automerge-action@v0.14.3
+      with:
+        mergeMethod: merge
+        branch: 'your-branch-name' # specify your branch name
+        token: ${{ secrets.GITHUB_TOKEN }}

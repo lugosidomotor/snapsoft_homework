@@ -46,7 +46,7 @@ publicly_accessible = true
 
 resource "aws_s3_bucket" "lambda_code_bucket" {
   bucket = "dnsdetectives-lambda-code-bucket"
-  acl    = "private" // Set ACL here instead of using aws_s3_bucket_acl
+  // Removed ACL configuration
 }
 
 resource "null_resource" "zip_lambda_function" {
@@ -67,5 +67,6 @@ resource "aws_s3_object" "lambda_code" {
 
   depends_on = [null_resource.zip_lambda_function]
 }
+
 
 

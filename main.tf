@@ -202,7 +202,7 @@ resource "aws_api_gateway_resource" "dnsdetectives_resource" {
 resource "aws_api_gateway_method" "dnsdetectives_method" {
   rest_api_id   = aws_api_gateway_rest_api.dnsdetectives_api.id
   resource_id   = aws_api_gateway_resource.dnsdetectives_resource.id
-  http_method   = "GET"   // Or POST, depending on your Lambda function
+  http_method   = "POST"   // Or POST, depending on your Lambda function
   authorization = "NONE"
 }
 

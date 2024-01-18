@@ -1,0 +1,72 @@
+name: Deploy/Destroy Terraform
+
+on:
+  workflow_dispatch:
+    inputs:
+      access-key-id:
+        description: 'AWS Access Key ID'
+        required: true
+        type: string
+      secret-access-key:
+        description: 'AWS Secret Access Key'
+        required: true
+        type: string
+      terraform-action:
+        description: 'Apply or Destroy'
+        required: true
+        type: choice
+        options: 
+        - apply
+        - destroy
+
+jobs:
+  terraform_apply:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Terraform
+      run: |
+        # Install the latest version of Terraform
+        TERRAFORM_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')
+        wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+        unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+        sudo mv terraform /usr/local/bin/
+        terraform version
+  
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ github.event.inputs.access-key-id }}
+        aws-secret-access-key: ${{ github.event.inputs.secret-access-key }}
+        aws-region: eu-central-1
+
+    - name: Check if S3 Bucket exists
+      run: |
+        bucket_name="cloudguruterraformstate"
+        region="eu-central-1"
+        
+        # Check if the bucket exists
+        if aws s3api head-bucket --bucket "$bucket_name" --region "$region" 2>/dev/null; then
+          echo "Bucket already exists: $bucket_name"
+        else
+          echo "Bucket does not exist. Creating $bucket_name..."
+          # Create the bucket
+          aws s3api create-bucket --bucket "$bucket_name" --region "$region" --create-bucket-configuration LocationConstraint="$region"
+          echo "Bucket created: $bucket_name"
+        fi
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Apply
+      env:
+        TF_INPUT: 0
+      run: |
+        #aws secretsmanager delete-secret --secret-id cloudguru-temp-ec2-ssh  --force-delete-without-recovery --region us-west-2
+        terraform ${{ github.event.inputs.terraform-action }} -auto-approve

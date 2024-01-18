@@ -174,9 +174,6 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
   runtime          = "nodejs18.x"
   role             = aws_iam_role.lambda_execution_role.arn
 
-  # Make sure this resource is created after the zip file is created
-  source_code_hash = filebase64sha256("${path.module}/lambda.zip")
-
   environment {
     variables = {
       DB_HOST     = aws_db_instance.dnsdetectives_db.address

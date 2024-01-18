@@ -169,6 +169,27 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
+resource "aws_iam_role_policy" "lambda_vpc_access" {
+  name = "dnsdetectives_lambda_vpc_access"
+  role = aws_iam_role.lambda_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DeleteNetworkInterface"
+        ],
+        Effect = "Allow",
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
 resource "aws_lambda_function" "dnsdetectives_lambda_function" {
   function_name    = "dnsdetectives_lambda_function"
   s3_bucket        = aws_s3_bucket.lambda_code_bucket.bucket

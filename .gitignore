@@ -1,2 +1,9 @@
-# Node.js dependencies
-node_modules/
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!*.tf
+!*.yaml
+!*.yml
+!*.js

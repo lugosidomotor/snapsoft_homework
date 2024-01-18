@@ -83,3 +83,25 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
 
   depends_on = [null_resource.zip_lambda_function]
 }
+
+resource "aws_security_group" "dnsdetectives_lambda_sg" {
+  vpc_id = aws_vpc.dnsdetectives_vpc.id
+  name   = "dnsdetectives-lambda-sg"
+
+  # Wide outbound rules to allow Lambda to access other services
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1" # -1 signifies all protocols
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group_rule" "allow_lambda_to_rds" {
+  type        = "ingress"
+  from_port   = 5432  # PostgreSQL default port
+  to_port     = 5432
+  protocol    = "tcp"
+  security_group_id = aws_security_group.dnsdetectives_security_group.id
+  source_security_group_id = aws_security_group.dnsdetectives_lambda_sg.id
+}

@@ -31,6 +31,17 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        ref: ${{ github.ref }}
+        
+    # Determine the current branch name
+    - name: Set branch related envs
+      id: getbranch
+      run: |
+        branch_name=$(git branch --show-current)
+        echo "CURRENT_BRANCH=$branch_name" >> $GITHUB_ENV
+        unique_suffix="lint-changes-$(date +'%Y%m%d%H%M%S')"
+        echo BRANCH_NAME="$branch_name-$unique_suffix"  >> $GITHUB_ENV
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
@@ -93,21 +104,6 @@ jobs:
     - name: Terraform Format
       run: terraform fmt
 
-    - name: Check for changes
-      id: git-check
-      run: |
-        if [[ `git status --porcelain` ]]; then
-          echo "::set-output name=changes::true"
-        fi
-
-    - name: Commit formatted code
-      if: steps.git-check.outputs.changes == 'true'
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add -u
-        git commit -m "Format Terraform code"
-
     - name: Terraform Validate
       run: terraform validate
 
@@ -118,8 +114,25 @@ jobs:
         #aws secretsmanager delete-secret --secret-id cloudguru-temp-ec2-ssh  --force-delete-without-recovery --region us-west-2
         terraform ${{ github.event.inputs.terraform-action }} -auto-approve
 
-    - name: Auto-merge to branch
-      if: steps.git-check.outputs.changes == 'true'
-      uses: ad-m/github-push-action@master
+    # Check if linting made any changes
+    - name: Check for modified files
+      id: git-check
+      run: |
+        git diff --exit-code || echo "##[set-output name=changed;]true"
+
+    - name: Run the Action
+      if: steps.git-check.outputs.changed == 'true'
+      uses: devops-infra/action-commit-push@master
       with:
-        github_token: ${{ secrets.PAT }}
+        github_token: "${{ secrets.GITHUB_TOKEN }}"
+        add_timestamp: false
+        commit_prefix: "[AUTO] "
+        commit_message: "automated Terraform fmt fixes from the GitHub Actions workflow"
+        force: false
+        target_branch: ${{ env.BRANCH_NAME }}
+
+    - name: Create Pull Request
+      if: steps.git-check.outputs.changed == 'true'
+      run: |
+        gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+        gh pr create --base ${{ env.CURRENT_BRANCH }} --head ${{ env.BRANCH_NAME }} --title "Automated Terraform format for ${{ env.CURRENT_BRANCH }} branch" --body "This PR contains automated lint fixes for ${{ env.CURRENT_BRANCH }} branch"

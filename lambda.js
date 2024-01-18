@@ -48,9 +48,7 @@ exports.handler = async (event) => {
      await ensureDbSchema(client); 
      console.log(`Resolving domain ${target} to ip address ...`) 
      const ip = await getDomainIP(target) 
-     console.log("Domain to ip resolved: "+ip) 
-
------------------------ Page 4-----------------------
+     console.log("Domain to ip resolved: "+ip)
 
     await insertRow(client, message, target,ip,new Date()) 
  } catch(e){ 
@@ -106,4 +104,4 @@ function validateEnv(envName, envValue){
     console.error(`No ${envName} configured!`); 
     throw `No ${envName} configured!`; 
  } 
-} 
+}

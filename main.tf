@@ -132,23 +132,18 @@ resource "aws_s3_bucket" "lambda_code_bucket" {
 }
 
 resource "null_resource" "zip_lambda_function" {
-  provisioner "local-exec" {
-    command = "zip lambda.zip lambda.js"
-    working_dir = path.module
-  }
-
   triggers = {
-    always_run = "${timestamp()}"
+    lambda_source_files = "${sha256(file("${path.module}/lambda.js"))}"
   }
-}
 
-resource "random_id" "lambda_zip_id" {
-  byte_length = 8
+  provisioner "local-exec" {
+    command = "zip -j ${path.module}/lambda.zip ${path.module}/lambda.js"
+  }
 }
 
 resource "aws_s3_object" "lambda_code" {
   bucket = aws_s3_bucket.lambda_code_bucket.bucket
-  key    = "lambda-${random_id.lambda_zip_id.hex}.zip"
+  key    = "lambda-${timestamp()}.zip"
   source = "${path.module}/lambda.zip"
 
   depends_on = [null_resource.zip_lambda_function]
@@ -179,7 +174,8 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
   runtime          = "nodejs18.x"
   role             = aws_iam_role.lambda_execution_role.arn
 
-  source_code_hash = "${filebase64sha256("${path.module}/lambda.zip")}"
+  # Make sure this resource is created after the zip file is created
+  source_code_hash = filebase64sha256("${path.module}/lambda.zip")
 
   environment {
     variables = {
@@ -190,10 +186,7 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
     }
   }
 
-  # Force recreation of the lambda function
-  lifecycle {
-    create_before_destroy = true
-  }
+  depends_on = [null_resource.zip_lambda_function]
 }
 
 ################## API Gateway ##################

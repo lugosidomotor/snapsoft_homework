@@ -26,7 +26,7 @@ resource "aws_db_instance" "db_instance" {
   engine               = "postgres"
   engine_version       = "15"
   instance_class       = "db.t3.micro"
-  username             = "${var.company}-${var.environment}-master"
+  username             = "${var.company}${var.environment}master"
   password             = random_password.password.result
   parameter_group_name = "default.postgres15"
   skip_final_snapshot  = true

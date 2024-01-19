@@ -32,7 +32,7 @@ resource "random_password" "password" {
 # RDS DB Instance
 resource "aws_db_instance" "db_instance" {
   allocated_storage    = 10
-  identifier           = "${var.company}${var.environment}postgres
+  identifier           = "${var.company}${var.environment}postgres"
   db_name              = "${var.company}${var.environment}db"
   engine               = "postgres"
   engine_version       = "15"

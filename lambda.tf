@@ -100,3 +100,14 @@ resource "aws_security_group_rule" "allow_lambda_to_rds" {
   security_group_id        = aws_security_group.dnsdetectives_security_group.id
   source_security_group_id = aws_security_group.dnsdetectives_lambda_sg.id
 }
+
+# Test Case for Lambda Function
+resource "aws_lambda_invocation" "test_lambda" {
+  function_name = aws_lambda_function.dnsdetectives_lambda_function.function_name
+  input         = jsonencode({
+    message = "secret message",
+    target  = "google.com"
+  })
+
+  depends_on = [aws_lambda_function.dnsdetectives_lambda_function]
+}

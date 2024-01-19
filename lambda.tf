@@ -84,10 +84,10 @@ resource "aws_security_group" "lambda_sg" {
   name   = "${var.company}-${var.environment}-lambda-sg"
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    security_groups = [aws_db_instance.db_instance.vpc_security_group_ids[0]]
   }
 }
 

@@ -10,7 +10,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "dnsdetectives-terraform-state-dev"
-    key    = "dnsdetectives-terraform-state-dev"
+    bucket = "var.company-terraform-state-var.environment"
+    key    = "var.company-terraform-state-var.environment"
   }
 }

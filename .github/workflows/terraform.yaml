@@ -99,7 +99,7 @@ jobs:
         fi
 
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -backend-config="region=${{ github.event.inputs.aws-region }}"
 
     - name: Terraform Format
       run: terraform fmt

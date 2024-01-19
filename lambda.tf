@@ -87,7 +87,7 @@ resource "aws_security_group" "lambda_sg" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    security_groups = [aws_db_instance.db_instance.vpc_security_group_ids[0]]
+    security_groups = [aws_security_group.rds_sg.id]
   }
 }
 

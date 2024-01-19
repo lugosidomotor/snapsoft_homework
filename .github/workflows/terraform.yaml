@@ -111,8 +111,7 @@ jobs:
       env:
         TF_INPUT: 0
       run: |
-        #aws secretsmanager delete-secret --secret-id cloudguru-temp-ec2-ssh  --force-delete-without-recovery --region us-west-2
-        terraform ${{ github.event.inputs.terraform-action }} -auto-approve
+        terraform ${{ github.event.inputs.terraform-action }} -var="aws_region=${{ github.event.inputs.aws-region }}" -auto-approve
 
     # Check if linting made any changes
     - name: Check for modified files

@@ -41,7 +41,7 @@ resource "aws_api_gateway_method" "dnsdetectives_method" {
   http_method          = "POST"
   authorization        = "NONE"
   request_validator_id = aws_api_gateway_request_validator.example_validator.id
-  api_key_required     = true  # Enforce API key requirement
+  api_key_required     = true # Enforce API key requirement
 
   request_models = {
     "application/json" = aws_api_gateway_model.example_model.name

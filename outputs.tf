@@ -3,6 +3,6 @@ output "api_gateway_endpoint" {
 }
 
 output "api_key" {
-  value = aws_api_gateway_api_key.example_api_key.value
+  value     = aws_api_gateway_api_key.example_api_key.value
   sensitive = true
 }

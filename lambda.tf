@@ -101,6 +101,14 @@ resource "aws_security_group_rule" "allow_lambda_to_rds" {
   source_security_group_id = aws_security_group.dnsdetectives_lambda_sg.id
 }
 
+resource "aws_lambda_permission" "allow_api_gateway" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.dnsdetectives_lambda_function.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.dnsdetectives_api.execution_arn}/*/*/dnsdetectives-path"
+}
+
 # Test Case for Lambda Function
 resource "aws_lambda_invocation" "test_lambda" {
   function_name = aws_lambda_function.dnsdetectives_lambda_function.function_name

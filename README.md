@@ -28,7 +28,7 @@ For this project, A Cloud Guru's AWS sandbox environment was used, which offers 
 
 ![Usage Image](images/proof_5.png)
 
-**Step 2.** Once Terraform has successfully created the environment, you can find a pre-configured (and security-first!) example curl command in the action summary. This command is ready for immediate use to interact with the newly created infrastructure.
+**Step 2.** Once Terraform has successfully created the environment, you can find a pre-configured (security-first!) example curl command in the action summary. This command is ready for immediate use to interact with the newly created infrastructure.
 
 ![Usage Image](images/proof_6.png)
 

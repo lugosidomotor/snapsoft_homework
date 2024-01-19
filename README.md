@@ -20,9 +20,20 @@ During the development, the use-case specifics, particularly around who needs ac
 
 ## Usage
 
-To deploy these resources, you'll need Terraform installed and configured with your AWS credentials. Run the usual Terraform commands (`terraform init`, `terraform apply`) to set up the infrastructure.
+**Step 1.** Start the Deploy/Destroy Terraform GitHub action. You will need to provide the desired AWS region, company name, and environment. Additionally, you will require your AWS Access Key ID and AWS Secret Access Key for authentication.
 
-Note: This code is more a quick solution rather than an extensively thought-out architecture. It's intended for scenarios where development time is a critical factor.
+![Usage Image](images/proof_1.png)
+
+For this project, A Cloud Guru's AWS sandbox environment was used, which offers a live environment for up to 3 hours.
+
+![Usage Image](images/proof_5.png)
+
+**Step 2.** Once Terraform has successfully created the environment, you can find a pre-configured (and security-first!) example curl command in the action summary. This command is ready for immediate use to interact with the newly created infrastructure.
+
+![Usage Image](images/proof_6.png)
+
+![Usage Image](images/proof_4.png)
+
 
 ## Disclaimer
 

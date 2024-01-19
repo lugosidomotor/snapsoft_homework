@@ -34,7 +34,6 @@ For this project, A Cloud Guru's AWS sandbox environment was used, which offers 
 
 ![Usage Image](images/proof_4.png)
 
-![Usage Image](images/proof_7.png)
 
 ## Disclaimer
 

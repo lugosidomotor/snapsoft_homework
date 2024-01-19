@@ -36,10 +36,10 @@ resource "aws_api_gateway_request_validator" "example_validator" {
 }
 
 resource "aws_api_gateway_method" "dnsdetectives_method" {
-  rest_api_id         = aws_api_gateway_rest_api.dnsdetectives_api.id
-  resource_id         = aws_api_gateway_resource.dnsdetectives_resource.id
-  http_method         = "POST"
-  authorization       = "NONE"
+  rest_api_id          = aws_api_gateway_rest_api.dnsdetectives_api.id
+  resource_id          = aws_api_gateway_resource.dnsdetectives_resource.id
+  http_method          = "POST"
+  authorization        = "NONE"
   request_validator_id = aws_api_gateway_request_validator.example_validator.id
 }
 

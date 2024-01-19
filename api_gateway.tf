@@ -12,17 +12,17 @@ resource "aws_api_gateway_resource" "dnsdetectives_resource" {
 resource "aws_api_gateway_method" "dnsdetectives_method" {
   rest_api_id   = aws_api_gateway_rest_api.dnsdetectives_api.id
   resource_id   = aws_api_gateway_resource.dnsdetectives_resource.id
-  http_method   = "POST"   // Or POST, depending on your Lambda function
+  http_method   = "POST" // Or POST, depending on your Lambda function
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "dnsdetectives_lambda_integration" {
-  rest_api_id = aws_api_gateway_rest_api.dnsdetectives_api.id
-  resource_id = aws_api_gateway_resource.dnsdetectives_resource.id
-  http_method = aws_api_gateway_method.dnsdetectives_method.http_method
+  rest_api_id             = aws_api_gateway_rest_api.dnsdetectives_api.id
+  resource_id             = aws_api_gateway_resource.dnsdetectives_resource.id
+  http_method             = aws_api_gateway_method.dnsdetectives_method.http_method
   integration_http_method = "POST"
-  type        = "AWS_PROXY"
-  uri         = aws_lambda_function.dnsdetectives_lambda_function.invoke_arn
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.dnsdetectives_lambda_function.invoke_arn
 }
 
 resource "aws_api_gateway_deployment" "dnsdetectives_deployment" {

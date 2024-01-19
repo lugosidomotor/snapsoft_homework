@@ -47,7 +47,7 @@ resource "aws_iam_role_policy" "lambda_vpc_access" {
           "ec2:DescribeNetworkInterfaces",
           "ec2:DeleteNetworkInterface"
         ],
-        Effect = "Allow",
+        Effect   = "Allow",
         Resource = "*"
       }
     ]
@@ -55,12 +55,12 @@ resource "aws_iam_role_policy" "lambda_vpc_access" {
 }
 
 resource "aws_lambda_function" "dnsdetectives_lambda_function" {
-  function_name    = "dnsdetectives_lambda_function"
-  s3_bucket        = "dnsdetectives-lambda-code-bucket"
-  s3_key           = aws_s3_object.lambda_code.key
-  handler          = "lambda.handler"
-  runtime          = "nodejs18.x"
-  role             = aws_iam_role.lambda_execution_role.arn
+  function_name = "dnsdetectives_lambda_function"
+  s3_bucket     = "dnsdetectives-lambda-code-bucket"
+  s3_key        = aws_s3_object.lambda_code.key
+  handler       = "lambda.handler"
+  runtime       = "nodejs18.x"
+  role          = aws_iam_role.lambda_execution_role.arn
 
   environment {
     variables = {
@@ -93,10 +93,10 @@ resource "aws_security_group" "dnsdetectives_lambda_sg" {
 }
 
 resource "aws_security_group_rule" "allow_lambda_to_rds" {
-  type        = "ingress"
-  from_port   = 5432  # PostgreSQL default port
-  to_port     = 5432
-  protocol    = "tcp"
-  security_group_id = aws_security_group.dnsdetectives_security_group.id
+  type                     = "ingress"
+  from_port                = 5432 # PostgreSQL default port
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.dnsdetectives_security_group.id
   source_security_group_id = aws_security_group.dnsdetectives_lambda_sg.id
 }

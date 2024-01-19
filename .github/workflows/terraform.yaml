@@ -105,7 +105,7 @@ jobs:
       run: terraform fmt
 
     - name: Terraform Validate
-      run: terraform validate -var="aws_region=${{ github.event.inputs.aws-region }}"
+      run: terraform validate
 
     - name: Terraform Apply
       env:

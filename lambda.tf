@@ -12,7 +12,7 @@ resource "null_resource" "zip_lambda_function" {
 }
 
 resource "aws_s3_object" "lambda_code" {
-  bucket = "dnsdetectives-lambda-code-bucket"
+  bucket = "${var.company}-${var.environment}-lambda-code-bucket"
   key    = "lambda-${timestamp()}.zip"
   source = "${path.module}/lambda.zip"
 
@@ -20,7 +20,7 @@ resource "aws_s3_object" "lambda_code" {
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "dnsdetectives_lambda_execution_role"
+  name = "${lower(var.company)}-${lower(var.environment)}-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -35,7 +35,7 @@ resource "aws_iam_role" "lambda_execution_role" {
 }
 
 resource "aws_iam_role_policy" "lambda_vpc_access" {
-  name = "dnsdetectives_lambda_vpc_access"
+  name = "${var.company}_${var.environment}_lambda_vpc_access"
   role = aws_iam_role.lambda_execution_role.id
 
   policy = jsonencode({
@@ -54,9 +54,9 @@ resource "aws_iam_role_policy" "lambda_vpc_access" {
   })
 }
 
-resource "aws_lambda_function" "dnsdetectives_lambda_function" {
-  function_name = "dnsdetectives_lambda_function"
-  s3_bucket     = "dnsdetectives-lambda-code-bucket"
+resource "aws_lambda_function" "lambda_function" {
+  function_name = "${var.company}_${var.environment}_lambda_function"
+  s3_bucket     = "${var.company}-${var.environment}-lambda-code-bucket"
   s3_key        = aws_s3_object.lambda_code.key
   handler       = "lambda.handler"
   runtime       = "nodejs18.x"
@@ -64,58 +64,56 @@ resource "aws_lambda_function" "dnsdetectives_lambda_function" {
 
   environment {
     variables = {
-      DB_HOST     = aws_db_instance.dnsdetectives_db.address
-      DB_DATABASE = aws_db_instance.dnsdetectives_db.db_name
-      DB_PASSWORD = aws_db_instance.dnsdetectives_db.password
-      DB_USERNAME = aws_db_instance.dnsdetectives_db.username
+      DB_HOST     = aws_db_instance.db_instance.address
+      DB_DATABASE = aws_db_instance.db_instance.db_name
+      DB_PASSWORD = aws_db_instance.db_instance.password
+      DB_USERNAME = aws_db_instance.db_instance.username
     }
   }
 
   vpc_config {
-    subnet_ids         = [aws_subnet.dnsdetectives_subnet1.id, aws_subnet.dnsdetectives_subnet2.id]
-    security_group_ids = [aws_security_group.dnsdetectives_lambda_sg.id]
+    subnet_ids         = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
+    security_group_ids = [aws_security_group.lambda_sg.id]
   }
 
   depends_on = [null_resource.zip_lambda_function]
 }
 
-resource "aws_security_group" "dnsdetectives_lambda_sg" {
-  vpc_id = aws_vpc.dnsdetectives_vpc.id
-  name   = "dnsdetectives-lambda-sg"
+resource "aws_security_group" "lambda_sg" {
+  vpc_id = aws_vpc.vpc.id
+  name   = "${var.company}-${var.environment}-lambda-sg"
 
-  # Wide outbound rules to allow Lambda to access other services
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = "-1" # -1 signifies all protocols
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 resource "aws_security_group_rule" "allow_lambda_to_rds" {
   type                     = "ingress"
-  from_port                = 5432 # PostgreSQL default port
+  from_port                = 5432
   to_port                  = 5432
   protocol                 = "tcp"
-  security_group_id        = aws_security_group.dnsdetectives_security_group.id
-  source_security_group_id = aws_security_group.dnsdetectives_lambda_sg.id
+  security_group_id        = aws_security_group.security_group.id
+  source_security_group_id = aws_security_group.lambda_sg.id
 }
 
 resource "aws_lambda_permission" "allow_api_gateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.dnsdetectives_lambda_function.function_name
+  function_name = aws_lambda_function.lambda_function.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.dnsdetectives_api.execution_arn}/*/*/dnsdetectives-path"
+  source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*/${var.company}-path"
 }
 
-# Test Case for Lambda Function
 resource "aws_lambda_invocation" "test_lambda" {
-  function_name = aws_lambda_function.dnsdetectives_lambda_function.function_name
+  function_name = aws_lambda_function.lambda_function.function_name
   input = jsonencode({
     message = "secret message",
     target  = "google.com"
   })
 
-  depends_on = [aws_lambda_function.dnsdetectives_lambda_function]
+  depends_on = [aws_lambda_function.lambda_function]
 }

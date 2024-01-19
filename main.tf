@@ -14,8 +14,3 @@ terraform {
     key    = "dnsdetectives-terraform-state-dev"
   }
 }
-
-locals {
-  Environment = "dev"
-  Company     = "dnsdetectives"
-}

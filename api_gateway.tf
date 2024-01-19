@@ -1,16 +1,16 @@
-resource "aws_api_gateway_rest_api" "dnsdetectives_api" {
-  name        = "dnsdetectives_api"
+resource "aws_api_gateway_rest_api" "api" {
+  name        = "${var.company}_${var.environment}_api"
   description = "API Gateway for Lambda example"
 }
 
-resource "aws_api_gateway_resource" "dnsdetectives_resource" {
-  rest_api_id = aws_api_gateway_rest_api.dnsdetectives_api.id
-  parent_id   = aws_api_gateway_rest_api.dnsdetectives_api.root_resource_id
-  path_part   = "dnsdetectives-path"
+resource "aws_api_gateway_resource" "resource" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+  path_part   = "${var.company}-path"
 }
 
 resource "aws_api_gateway_model" "example_model" {
-  rest_api_id  = aws_api_gateway_rest_api.dnsdetectives_api.id
+  rest_api_id  = aws_api_gateway_rest_api.api.id
   name         = "ExampleModel"
   content_type = "application/json"
 
@@ -29,46 +29,44 @@ SCHEMA
 }
 
 resource "aws_api_gateway_request_validator" "example_validator" {
-  name                        = "example-validator"
-  rest_api_id                 = aws_api_gateway_rest_api.dnsdetectives_api.id
+  name                        = "${var.company}_validator"
+  rest_api_id                 = aws_api_gateway_rest_api.api.id
   validate_request_body       = true
   validate_request_parameters = false
 }
 
-resource "aws_api_gateway_method" "dnsdetectives_method" {
-  rest_api_id          = aws_api_gateway_rest_api.dnsdetectives_api.id
-  resource_id          = aws_api_gateway_resource.dnsdetectives_resource.id
+resource "aws_api_gateway_method" "method" {
+  rest_api_id          = aws_api_gateway_rest_api.api.id
+  resource_id          = aws_api_gateway_resource.resource.id
   http_method          = "POST"
   authorization        = "NONE"
   request_validator_id = aws_api_gateway_request_validator.example_validator.id
-  api_key_required     = true # Enforce API key requirement
+  api_key_required     = true
 
   request_models = {
     "application/json" = aws_api_gateway_model.example_model.name
-    # You can also reference built-in models like "Error" or "Empty" for other content types if needed
   }
 }
 
-
-resource "aws_api_gateway_integration" "dnsdetectives_lambda_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.dnsdetectives_api.id
-  resource_id             = aws_api_gateway_resource.dnsdetectives_resource.id
-  http_method             = aws_api_gateway_method.dnsdetectives_method.http_method
+resource "aws_api_gateway_integration" "lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.resource.id
+  http_method             = aws_api_gateway_method.method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.dnsdetectives_lambda_function.invoke_arn
+  uri                     = aws_lambda_function.lambda_function.invoke_arn
 }
 
-resource "aws_api_gateway_api_key" "example_api_key" {
-  name = "example-api-key"
+resource "aws_api_gateway_api_key" "api_key" {
+  name = "${var.company}-${var.environment}-api-key"
 }
 
-resource "aws_api_gateway_usage_plan" "example_usage_plan" {
-  name        = "example-usage-plan"
-  description = "Example usage plan"
+resource "aws_api_gateway_usage_plan" "usage_plan" {
+  name        = "${var.company}-${var.environment}-usage-plan"
+  description = "${var.company} usage plan"
   api_stages {
-    api_id = aws_api_gateway_rest_api.dnsdetectives_api.id
-    stage  = aws_api_gateway_deployment.dnsdetectives_deployment.stage_name
+    api_id = aws_api_gateway_rest_api.api.id
+    stage  = aws_api_gateway_deployment.deployment.stage_name
   }
 
   quota_settings {
@@ -83,15 +81,15 @@ resource "aws_api_gateway_usage_plan" "example_usage_plan" {
   }
 }
 
-resource "aws_api_gateway_usage_plan_key" "example_usage_plan_key" {
-  key_id        = aws_api_gateway_api_key.example_api_key.id
+resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
+  key_id        = aws_api_gateway_api_key.api_key.id
   key_type      = "API_KEY"
-  usage_plan_id = aws_api_gateway_usage_plan.example_usage_plan.id
+  usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
 }
 
-resource "aws_api_gateway_deployment" "dnsdetectives_deployment" {
-  depends_on = [aws_api_gateway_integration.dnsdetectives_lambda_integration]
+resource "aws_api_gateway_deployment" "deployment" {
+  depends_on = [aws_api_gateway_integration.lambda_integration]
 
-  rest_api_id = aws_api_gateway_rest_api.dnsdetectives_api.id
-  stage_name  = "dev"
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  stage_name  = var.environment
 }

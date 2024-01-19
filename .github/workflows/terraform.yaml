@@ -23,6 +23,16 @@ on:
         required: false
         type: string
         default: 'us-west-2'
+      company:
+        description: 'Company name'
+        required: false
+        type: string
+        default: 'detectives'
+      environment:
+        description: 'Environment'
+        required: false
+        type: string
+        default: 'dev'
 
 jobs:
   terraform_apply:
@@ -70,7 +80,7 @@ jobs:
 
     - name: Check if S3 State Bucket exists
       run: |
-        bucket_name="dnsdetectives-terraform-state-dev"
+        bucket_name="${{ github.event.inputs.company }}-terraform-state-${{ github.event.inputs.environment }}"
         region="${{ github.event.inputs.aws-region }}"
         
         # Check if the bucket exists
@@ -85,7 +95,7 @@ jobs:
         
     - name: Check if S3 Lambda Code Bucket exists
       run: |
-        bucket_name="dnsdetectives-lambda-code-bucket"
+        bucket_name="${{ github.event.inputs.company }}-${{ github.event.inputs.environment }}-lambda-code-bucket"
         region="${{ github.event.inputs.aws-region }}"
         
         # Check if the bucket exists
@@ -111,7 +121,7 @@ jobs:
       env:
         TF_INPUT: 0
       run: |
-        terraform ${{ github.event.inputs.terraform-action }} -var="aws_region=${{ github.event.inputs.aws-region }}" -auto-approve
+        terraform ${{ github.event.inputs.terraform-action }} -var="aws_region=${{ github.event.inputs.aws-region }}" -var="company=${{ github.event.inputs.company }}" -var="environment=${{ github.event.inputs.environment }}" -auto-approve
         
     - name: Set Outputs as Env Vars
       run: |

@@ -1,37 +1,37 @@
 # Create a DB Subnet Group for RDS
-resource "aws_db_subnet_group" "dnsdetectives_db_subnet_group" {
-  name       = "dnsdetectives-db-subnet-group"
-  subnet_ids = [aws_subnet.dnsdetectives_subnet1.id, aws_subnet.dnsdetectives_subnet2.id]
+resource "aws_db_subnet_group" "db_subnet_group" {
+  name       = "${lower(var.company)}-${lower(var.environment)}-dbsubnetgroup"
+  subnet_ids = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 
   tags = {
-    Name = "dnsdetectivesDBSubnetGroup"
+    Name = "${var.company}-${var.environment}-DBSubnetGroup"
   }
 }
 
 # Security Group for RDS
-resource "aws_security_group" "dnsdetectives_security_group" {
-  vpc_id = aws_vpc.dnsdetectives_vpc.id
+resource "aws_security_group" "security_group" {
+  vpc_id = aws_vpc.vpc.id
 }
 
 resource "random_password" "password" {
   length           = 16
   special          = true
-  override_special = "_%@"
+  override_special = "_%#"
 }
 
 # RDS DB Instance
-resource "aws_db_instance" "dnsdetectives_db" {
+resource "aws_db_instance" "db_instance" {
   allocated_storage    = 10
-  db_name              = "dnsdetectivesdb"
+  db_name              = "${var.company}${var.environment}db"
   engine               = "postgres"
   engine_version       = "15"
   instance_class       = "db.t3.micro"
-  username             = "dnsdetectivesmaster"
+  username             = "${var.company}${var.environment}master"
   password             = random_password.password.result
   parameter_group_name = "default.postgres15"
   skip_final_snapshot  = true
   publicly_accessible  = true
 
-  vpc_security_group_ids = [aws_security_group.dnsdetectives_security_group.id]
-  db_subnet_group_name   = aws_db_subnet_group.dnsdetectives_db_subnet_group.name
+  vpc_security_group_ids = [aws_security_group.security_group.id]
+  db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
 }

@@ -13,6 +13,12 @@ resource "aws_security_group" "dnsdetectives_security_group" {
   vpc_id = aws_vpc.dnsdetectives_vpc.id
 }
 
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
+}
+
 # RDS DB Instance
 resource "aws_db_instance" "dnsdetectives_db" {
   allocated_storage    = 10
@@ -21,7 +27,7 @@ resource "aws_db_instance" "dnsdetectives_db" {
   engine_version       = "15"
   instance_class       = "db.t3.micro"
   username             = "dnsdetectivesmaster"
-  password             = "securepass"
+  password             = random_password.password.result
   parameter_group_name = "default.postgres15"
   skip_final_snapshot  = true
   publicly_accessible  = true

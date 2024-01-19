@@ -112,6 +112,17 @@ jobs:
         TF_INPUT: 0
       run: |
         terraform ${{ github.event.inputs.terraform-action }} -var="aws_region=${{ github.event.inputs.aws-region }}" -auto-approve
+        
+    - name: Set Outputs as Env Vars
+      run: |
+        echo "API_ENDPOINT=$(terraform output -raw api_gateway_endpoint)" >> $GITHUB_ENV
+        echo "API_KEY=$(terraform output -raw api_key)" >> $GITHUB_ENV
+
+    - name: Test API Endpoint
+      run: |
+        curl_command="curl -X POST -H 'Content-Type: application/json' -H 'x-api-key: ${{ env.API_KEY }}' -d '{\"message\": \"Example message\", \"target\": \"example.com\"}' ${{ env.API_ENDPOINT }}"
+        echo "Executing: $curl_command"
+        echo "$curl_command" >> $GITHUB_STEP_SUMMARY
 
     # Check if linting made any changes
     - name: Check for modified files

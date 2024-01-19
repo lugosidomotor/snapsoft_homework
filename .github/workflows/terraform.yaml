@@ -109,7 +109,7 @@ jobs:
         fi
 
     - name: Terraform Init
-      run: terraform init -backend-config="region=${{ github.event.inputs.aws-region }}"
+      run: terraform init -backend-config="region=${{ github.event.inputs.aws-region }}" -backend-config="key=${{ github.event.inputs.company }}-terraform-state-${{ github.event.inputs.environment }}" -backend-config="bucket=${{ github.event.inputs.company }}-terraform-state-${{ github.event.inputs.environment }}"
 
     - name: Terraform Format
       run: terraform fmt

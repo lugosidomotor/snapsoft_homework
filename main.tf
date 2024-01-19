@@ -9,8 +9,5 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket = "${var.company}-terraform-state-${var.environment}"
-    key    = "${var.company}-terraform-state-${var.environment}"
-  }
+  backend "s3" {}
 }

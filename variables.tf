@@ -3,13 +3,13 @@ variable "aws_region" {
   type        = string
 }
 
-variable "Environment" {
+variable environment" {
   description = "The deployment environment"
   type        = string
   default     = "dev"
 }
 
-variable "Company" {
+variable "company" {
   description = "The company name"
   type        = string
   default     = "dnsdetectives"

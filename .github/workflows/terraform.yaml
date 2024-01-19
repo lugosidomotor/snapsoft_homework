@@ -124,7 +124,7 @@ jobs:
       if: steps.git-check.outputs.changed == 'true'
       uses: devops-infra/action-commit-push@master
       with:
-        github_token: "${{ secrets.PAT }}"
+        github_token: "${{ secrets.GITHUB_TOKEN }}"
         add_timestamp: false
         commit_prefix: "[AUTO] "
         commit_message: "automated Terraform fmt fixes from the GitHub Actions workflow"
@@ -134,5 +134,5 @@ jobs:
     - name: Create Pull Request
       if: steps.git-check.outputs.changed == 'true'
       run: |
-        gh auth login --with-token <<< "${{ secrets.PAT }}"
+        gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
         gh pr create --base ${{ env.CURRENT_BRANCH }} --head ${{ env.BRANCH_NAME }} --title "Automated Terraform format for ${{ env.CURRENT_BRANCH }} branch" --body "This PR contains automated lint fixes for ${{ env.CURRENT_BRANCH }} branch"

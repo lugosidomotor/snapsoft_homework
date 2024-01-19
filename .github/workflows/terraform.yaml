@@ -121,7 +121,7 @@ jobs:
       env:
         TF_INPUT: 0
       run: |
-        terraform ${{ github.event.inputs.terraform-action }} -var="aws_region=${{ github.event.inputs.aws-region }}" -var="company=${{ github.event.inputs.company }} -var="environment=${{ github.event.inputs.environment }} -auto-approve
+        terraform ${{ github.event.inputs.terraform-action }} -var="aws_region=${{ github.event.inputs.aws-region }}" -var="company=${{ github.event.inputs.company }}" -var="environment=${{ github.event.inputs.environment }}" -auto-approve
         
     - name: Set Outputs as Env Vars
       run: |

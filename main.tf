@@ -3,12 +3,16 @@ terraform {
     aws = {
       source = "hashicorp/aws"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 
   backend "s3" {
     bucket = "dnsdetectives-terraform-state-dev"
     key    = "dnsdetectives-terraform-state-dev"
-    region = "us-west-2"
+    region = var.aws_region
   }
 }
 

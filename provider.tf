@@ -3,8 +3,8 @@ provider "aws" {
   default_tags {
     tags = {
       Terraform   = "true"
-      Environment = vars.environment
-      Company     = vars.company
+      Environment = var.environment
+      Company     = var.company
     }
   }
 }

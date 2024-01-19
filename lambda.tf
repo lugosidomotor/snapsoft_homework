@@ -11,6 +11,14 @@ resource "null_resource" "zip_lambda_function" {
   }
 }
 
+resource "aws_s3_object" "lambda_code" {	
+  bucket = "${var.company}-${var.environment}-lambda-code-bucket"	
+  key    = "lambda-${timestamp()}.zip"	
+  source = "${path.module}/lambda.zip"	
+
+  depends_on = [null_resource.zip_lambda_function]	
+}	
+
 resource "aws_iam_role" "lambda_execution_role" {
   name = "${lower(var.company)}-${lower(var.environment)}-lambda-role"
 

@@ -11,13 +11,13 @@ resource "null_resource" "zip_lambda_function" {
   }
 }
 
-resource "aws_s3_object" "lambda_code" {	
-  bucket = "${var.company}-${var.environment}-lambda-code-bucket"	
-  key    = "lambda-${timestamp()}.zip"	
-  source = "${path.module}/lambda.zip"	
+resource "aws_s3_object" "lambda_code" {
+  bucket = "${var.company}-${var.environment}-lambda-code-bucket"
+  key    = "lambda-${timestamp()}.zip"
+  source = "${path.module}/lambda.zip"
 
-  depends_on = [null_resource.zip_lambda_function]	
-}	
+  depends_on = [null_resource.zip_lambda_function]
+}
 
 resource "aws_iam_role" "lambda_execution_role" {
   name = "${lower(var.company)}-${lower(var.environment)}-lambda-role"
@@ -84,9 +84,9 @@ resource "aws_security_group" "lambda_sg" {
   name   = "${var.company}-${var.environment}-lambda-sg"
 
   egress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
     security_groups = [aws_security_group.rds_sg.id]
   }
 }

@@ -20,7 +20,7 @@ During the development, the use-case specifics, particularly around who needs ac
 
 ## Usage
 
-**Step 1.** Start the Deploy/Destroy Terraform GitHub action. You will need to provide the desired AWS region, company name, and environment. Additionally, you will require your AWS Access Key ID and AWS Secret Access Key for authentication.
+**Step 1.** Start the Deploy/Destroy Terraform GitHub action. You will need to provide the desired AWS region, company name, and environment. It will require your AWS Access Key ID and AWS Secret Access Key for authentication.
 
 ![Usage Image](images/proof_1.png)
 

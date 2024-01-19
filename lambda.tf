@@ -20,7 +20,7 @@ resource "aws_s3_object" "lambda_code" {
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "${var.company}-${var.environment}-lambda-role"
+  name = "${var.company}_${var.environment}_lambda_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",

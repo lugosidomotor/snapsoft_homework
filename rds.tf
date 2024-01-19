@@ -1,6 +1,6 @@
 # Create a DB Subnet Group for RDS
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = "${var.company}-${var.environment}-db-subnet-group"
+  name       = "${lower(var.company)}-${lower(var.environment)}-db-subnet-group"
   subnet_ids = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 
   tags = {

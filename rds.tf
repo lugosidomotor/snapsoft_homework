@@ -9,8 +9,18 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 }
 
 # Security Group for RDS
-resource "aws_security_group" "security_group" {
+resource "aws_security_group" "rds_sg" {
   vpc_id = aws_vpc.vpc.id
+  name   = "${var.company}-${var.environment}-rds-sg"
+}
+
+resource "aws_security_group_rule" "allow_lambda_to_rds" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.rds_sg.id
+  source_security_group_id = aws_security_group.lambda_sg.id
 }
 
 resource "random_password" "password" {
@@ -22,6 +32,7 @@ resource "random_password" "password" {
 # RDS DB Instance
 resource "aws_db_instance" "db_instance" {
   allocated_storage    = 10
+  identifier           = "${var.company}${var.environment}postgres"
   db_name              = "${var.company}${var.environment}db"
   engine               = "postgres"
   engine_version       = "15"
@@ -32,6 +43,6 @@ resource "aws_db_instance" "db_instance" {
   skip_final_snapshot  = true
   publicly_accessible  = true
 
-  vpc_security_group_ids = [aws_security_group.security_group.id]
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
 }

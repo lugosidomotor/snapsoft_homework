@@ -3,7 +3,7 @@ variable "aws_region" {
   type        = string
 }
 
-variable environment" {
+variable "environment" {
   description = "The deployment environment"
   type        = string
   default     = "dev"

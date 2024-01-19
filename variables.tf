@@ -6,12 +6,10 @@ variable "aws_region" {
 variable "environment" {
   description = "The deployment environment"
   type        = string
-  default     = "dev"
 }
 
 variable "company" {
   description = "The company name"
   type        = string
-  default     = "dnsdetectives"
 }
 

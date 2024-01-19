@@ -52,6 +52,36 @@ resource "aws_api_gateway_integration" "dnsdetectives_lambda_integration" {
   uri                     = aws_lambda_function.dnsdetectives_lambda_function.invoke_arn
 }
 
+resource "aws_api_gateway_api_key" "example_api_key" {
+  name = "example-api-key"
+}
+
+resource "aws_api_gateway_usage_plan" "example_usage_plan" {
+  name        = "example-usage-plan"
+  description = "Example usage plan"
+  api_stages {
+    api_id = aws_api_gateway_rest_api.dnsdetectives_api.id
+    stage  = aws_api_gateway_deployment.dnsdetectives_deployment.stage_name
+  }
+
+  quota_settings {
+    limit  = 1000
+    offset = 1
+    period = "DAY"
+  }
+
+  throttle_settings {
+    burst_limit = 20
+    rate_limit  = 10
+  }
+}
+
+resource "aws_api_gateway_usage_plan_key" "example_usage_plan_key" {
+  key_id        = aws_api_gateway_api_key.example_api_key.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.example_usage_plan.id
+}
+
 resource "aws_api_gateway_deployment" "dnsdetectives_deployment" {
   depends_on = [aws_api_gateway_integration.dnsdetectives_lambda_integration]
 

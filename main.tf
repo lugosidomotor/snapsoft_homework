@@ -4,11 +4,11 @@ terraform {
       source = "hashicorp/aws"
     }
   }
-  
+
   backend "s3" {
-   bucket = "dnsdetectives-terraform-state-dev"
-   key    = "dnsdetectives-terraform-state-dev"
-   region = "us-west-2"
+    bucket = "dnsdetectives-terraform-state-dev"
+    key    = "dnsdetectives-terraform-state-dev"
+    region = "us-west-2"
   }
 }
 

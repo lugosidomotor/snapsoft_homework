@@ -17,6 +17,7 @@ During the development, the use-case specifics, particularly around who needs ac
 - **Lambda Functions**: Deployed with environment variables and VPC configurations.
 - **API Gateway**: Configured for public internet access, considering the ambiguous nature of the use-case requirements.
 - **VPC and Networking**: Designed for straightforward public accessibility, without intricate zero-trust or VPN-based network configurations.
+- **AWS WAF**: Implemented to enhance security. The WAF is configured with a default action to block all incoming requests except those originating from Hungary.
 
 ## Usage
 

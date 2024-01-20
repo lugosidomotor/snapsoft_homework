@@ -1,6 +1,7 @@
 # Create a WAF Web ACL
 resource "aws_wafv2_web_acl" "web_acl" {
   name        = "${var.company}-${var.environment}-web-acl"
+  depends_on  = [aws_api_gateway_integration.lambda_integration]
   description = "Web ACL for API Gateway"
   scope       = "REGIONAL"
 

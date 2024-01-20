@@ -36,11 +36,8 @@ resource "aws_wafv2_web_acl" "web_acl" {
   }
 }
 
-# Associate the WAF Web ACL with the API Gateway
-resource "aws_api_gateway_stage" "stage" {
-  stage_name    = aws_api_gateway_deployment.deployment.stage_name
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  deployment_id = aws_api_gateway_deployment.deployment.id
-
-  web_acl_arn = aws_wafv2_web_acl.web_acl.arn
+# Associate the WAF Web ACL with the API Gateway REST API
+resource "aws_wafv2_web_acl_association" "web_acl_association" {
+  resource_arn = aws_api_gateway_rest_api.api.execution_arn
+  web_acl_arn  = aws_wafv2_web_acl.web_acl.arn
 }

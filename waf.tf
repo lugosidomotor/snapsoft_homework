@@ -38,6 +38,6 @@ resource "aws_wafv2_web_acl" "web_acl" {
 
 # Associate the WAF Web ACL with the API Gateway REST API
 resource "aws_wafv2_web_acl_association" "web_acl_association" {
-  resource_arn = aws_api_gateway_rest_api.api.execution_arn
+  resource_arn = aws_api_gateway_rest_api.api.arn
   web_acl_arn  = aws_wafv2_web_acl.web_acl.arn
 }

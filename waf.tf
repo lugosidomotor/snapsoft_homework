@@ -1,7 +1,7 @@
-# AWS WAFv2 Web ACL for Geolocation filtering
-resource "aws_wafv2_web_acl" "example_acl" {
-  name        = "${var.company}-${var.environment}-waf-acl"
-  description = "Web ACL with geolocation rule"
+# Create a WAF Web ACL
+resource "aws_wafv2_web_acl" "web_acl" {
+  name        = "${var.company}-${var.environment}-web-acl"
+  description = "Web ACL for API Gateway"
   scope       = "REGIONAL"
 
   default_action {
@@ -23,21 +23,24 @@ resource "aws_wafv2_web_acl" "example_acl" {
     }
 
     visibility_config {
-      cloudwatch_metrics_enabled = false
+      cloudwatch_metrics_enabled = true
       metric_name                = "AllowOnlyHungary"
-      sampled_requests_enabled   = false
+      sampled_requests_enabled   = true
     }
   }
 
   visibility_config {
     cloudwatch_metrics_enabled = false
-    metric_name                = "${var.company}-${var.environment}-waf-acl"
+    metric_name                = "${var.company}-${var.environment}-web-acl"
     sampled_requests_enabled   = false
   }
 }
 
-# Associate WAF Web ACL with the API Gateway
-resource "aws_wafv2_web_acl_association" "example_association" {
-  resource_arn = aws_api_gateway_rest_api.api.execution_arn
-  web_acl_arn  = aws_wafv2_web_acl.example_acl.arn
+# Associate the WAF Web ACL with the API Gateway
+resource "aws_api_gateway_stage" "stage" {
+  stage_name    = aws_api_gateway_deployment.deployment.stage_name
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  deployment_id = aws_api_gateway_deployment.deployment.id
+
+  web_acl_arn = aws_wafv2_web_acl.web_acl.arn
 }

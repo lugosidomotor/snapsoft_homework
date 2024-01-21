@@ -118,6 +118,7 @@ jobs:
             --attribute-definitions AttributeName=ID,AttributeType=S \
             --key-schema AttributeName=ID,KeyType=HASH \
             --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+            --region ${{ github.event.inputs.aws-region }}
           echo "Table created."
         else
           echo "Table already exists. Skipping creation."

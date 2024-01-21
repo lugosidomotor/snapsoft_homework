@@ -107,7 +107,7 @@ table_name="${company}-terraform-lock-${environment}"
 region="${aws_region}"
 
 # Describe the table and check if it exists
-response=$(aws dynamodb describe-table --table-name "$table_name" --region "$region" 2>&1) || true
+response=$(aws dynamodb describe-table --table-name "$table_name" --region "$region" 2>&1)
 table_not_found=$(echo $response | grep -c "Requested resource not found")
 
 # Create table if not found

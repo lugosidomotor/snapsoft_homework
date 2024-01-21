@@ -1,0 +1,5 @@
+access_key_id=
+secret_access_key=
+terraform_action=apply
+aws_region=us-west-2
+environment=dev

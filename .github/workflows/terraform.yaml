@@ -110,15 +110,20 @@ jobs:
 
     - name: Check and Create DynamoDB Table
       run: |
+        TABLE_NAME="${{ github.event.inputs.company }}-terraform-lock-${{ github.event.inputs.environment }}"
+        REGION="${{ github.event.inputs.aws-region }}"
+        set +e
+        RESPONSE=$(aws dynamodb describe-table --table-name "$TABLE_NAME" --region "$REGION" 2>&1)
+        TABLE_NOT_FOUND=$(echo $RESPONSE | grep -c "Requested resource not found")
         set -e
-        TABLE_EXISTS=$(aws dynamodb describe-table --table-name ${{ github.event.inputs.company }}-terraform-lock-${{ github.event.inputs.environment }} --query "Table" --output json 2>&1 || echo "NOT_FOUND")
-        if [[ $TABLE_EXISTS == "NOT_FOUND" ]]; then
+        if [ $TABLE_NOT_FOUND -eq 1 ]; then
           echo "Table does not exist. Creating table."
-          aws dynamodb create-table --table-name ${{ github.event.inputs.company }}-terraform-lock-${{ github.event.inputs.environment }} \
+          aws dynamodb create-table \
+            --table-name "$TABLE_NAME" \
             --attribute-definitions AttributeName=ID,AttributeType=S \
             --key-schema AttributeName=ID,KeyType=HASH \
-            --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
-            --region ${{ github.event.inputs.aws-region }}
+            --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+            --region "$REGION"
           echo "Table created."
         else
           echo "Table already exists. Skipping creation."

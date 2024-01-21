@@ -95,8 +95,34 @@ else
   echo "Bucket created: $bucket_name"
 fi
 
+# DynamoDB Table Check and Creation
+table_name="${company}-terraform-lock-${environment}"
+region="${aws_region}"
+
+# Describe the table and check if it exists
+response=$(aws dynamodb describe-table --table-name "$table_name" --region "$region" 2>&1) || true
+table_not_found=$(echo $response | grep -c "Requested resource not found")
+
+# Create table if not found
+if [ $table_not_found -eq 1 ]; then
+  echo "Table does not exist. Creating table."
+  aws dynamodb create-table \
+       --region "$region" \
+       --table-name "$table_name" \
+       --attribute-definitions AttributeName=LockID,AttributeType=S \
+       --key-schema AttributeName=LockID,KeyType=HASH \
+       --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1  
+  echo "Table created."
+else
+  echo "Table already exists. Skipping creation."
+fi
+
 # Terraform Initialization
-terraform init -backend-config="region=$aws_region" -backend-config="key=$company-terraform-state-$environment" -backend-config="bucket=$company-terraform-state-$environment"
+terraform init \
+  -backend-config="dynamodb_table=$table_name" \
+  -backend-config="region=$region" \
+  -backend-config="key=$company-terraform-state-$environment" \
+  -backend-config="bucket=$company-terraform-state-$environment"
 
 # Terraform Formatting
 terraform fmt
@@ -105,7 +131,11 @@ terraform fmt
 terraform validate
 
 # Terraform Apply or Destroy
-terraform $terraform_action -var="aws_region=$aws_region" -var="company=$company" -var="environment=$environment" -auto-approve
+terraform $terraform_action \
+  -var="aws_region=$aws_region" \
+  -var="company=$company" \
+  -var="environment=$environment" \
+  -auto-approve
 
 # Outputs
 if [ "$terraform_action" = "apply" ]; then

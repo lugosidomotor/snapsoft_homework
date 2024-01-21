@@ -108,9 +108,29 @@ jobs:
           echo "Bucket created: $bucket_name"
         fi
 
-    - name: Terraform Init
-      run: terraform init -backend-config="region=${{ github.event.inputs.aws-region }}" -backend-config="key=${{ github.event.inputs.company }}-terraform-state-${{ github.event.inputs.environment }}" -backend-config="bucket=${{ github.event.inputs.company }}-terraform-state-${{ github.event.inputs.environment }}"
+    - name: Check and Create DynamoDB Table
+      run: |
+        set -e
+        TABLE_EXISTS=$(aws dynamodb describe-table --table-name ${{ github.event.inputs.company }}-terraform-lock-${{ github.event.inputs.environment }} --query "Table" --output json 2>&1 || echo "NOT_FOUND")
+        if [[ $TABLE_EXISTS == "NOT_FOUND" ]]; then
+          echo "Table does not exist. Creating table."
+          aws dynamodb create-table --table-name ${{ github.event.inputs.company }}-terraform-lock-${{ github.event.inputs.environment }} \
+            --attribute-definitions AttributeName=ID,AttributeType=S \
+            --key-schema AttributeName=ID,KeyType=HASH \
+            --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+          echo "Table created."
+        else
+          echo "Table already exists. Skipping creation."
+        fi
 
+    - name: Terraform Init
+      run: |
+        terraform init \
+          -var="dynamodb_table_name=${{ github.event.inputs.company }}-terraform-lock-${{ github.event.inputs.environment }}" \
+          -var="aws_region=${{ github.event.inputs.aws-region }}" \
+          -var="company=${{ github.event.inputs.company }}" \
+          -var="environment=${{ github.event.inputs.environment }}"
+          
     - name: Terraform Format
       run: terraform fmt
 
@@ -121,8 +141,13 @@ jobs:
       env:
         TF_INPUT: 0
       run: |
-        terraform ${{ github.event.inputs.terraform-action }} -var="aws_region=${{ github.event.inputs.aws-region }}" -var="company=${{ github.event.inputs.company }}" -var="environment=${{ github.event.inputs.environment }}" -auto-approve
-        
+        terraform ${{ github.event.inputs.terraform-action }} \
+          -var="dynamodb_table_name=${{ github.event.inputs.company }}-terraform-lock-${{ github.event.inputs.environment }}" \
+          -var="aws_region=${{ github.event.inputs.aws-region }}" \
+          -var="company=${{ github.event.inputs.company }}" \
+          -var="environment=${{ github.event.inputs.environment }}" \
+          -auto-approve
+          
     - name: Set Outputs as Env Vars
       run: |
         echo "API_ENDPOINT=$(terraform output -raw api_gateway_endpoint)" >> $GITHUB_ENV

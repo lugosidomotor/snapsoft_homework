@@ -77,6 +77,7 @@ npm install pg
 export AWS_ACCESS_KEY_ID=$access_key_id
 export AWS_SECRET_ACCESS_KEY=$secret_access_key
 export AWS_DEFAULT_REGION=$aws_region
+export AWS_PAGER=''
 
 # Check if S3 State Bucket exists
 bucket_name="${company}-terraform-state-${environment}"

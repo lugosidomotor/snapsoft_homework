@@ -6,6 +6,15 @@ command_exists() {
   type "$1" &> /dev/null
 }
 
+# Menu for selecting Terraform action
+echo "Select Terraform action:"
+select terraform_action in "apply" "destroy"; do
+  case $terraform_action in
+    apply | destroy ) break;;
+    * ) echo "Invalid option. Please choose apply or destroy.";;
+  esac
+done
+
 # Check for AWS CLI
 if ! command_exists aws; then
   echo "Installing AWS CLI..."
@@ -59,7 +68,6 @@ fi
 # Ensure required variables are set
 : "${access_key_id:?Need to set access-key-id in local_run_envs}"
 : "${secret_access_key:?Need to set secret-access-key in local_run_envs}"
-: "${terraform_action:?Need to set terraform-action in local_run_envs (apply or destroy)}"
 : "${aws_region:=us-west-2}"  # Default to us-west-2 if not set
 : "${environment:=dev}"
 
